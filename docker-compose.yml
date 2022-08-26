@@ -18,9 +18,24 @@ services:
       - ${data}/protected_media:/protected_media
     ports:
       - ${httpPort}:80
+    networks:
+      - proxy
     depends_on:
       - backend
       - frontend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.librephotos-secure.entrypoints=websecure"
+      - "traefik.http.routers.librephotos-secure.rule=Host(`hallowelt.r18i.me`)"
+      - "traefik.http.routers.librephotos-secure.tls=true"
+      - "traefik.http.routers.librephotos-secure.service=librephotos"
+      - "traefik.http.services.librephotos.loadbalancer.server.port=80"
+      - "traefik.docker.network=proxy"
+  #  labels:
+  # - "traefik.enable=true"
+  #   - "traefik.docker.network=proxy"
+  #   - "traefik.http.routers.librephotos-secure.entrypoints=websecure"
+  #   - "traefik.http.routers.librephotos-secure.rule=Host(`hallowelt.r18i.me`)"
 
   db:
     image: postgres:13
@@ -39,11 +54,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - proxy
       
   frontend:
     image: reallibrephotos/librephotos-frontend:${tag}
     container_name: frontend
     restart: unless-stopped
+    networks:
+      - proxy
     depends_on:
       - backend
 
@@ -56,6 +75,8 @@ services:
       - ${data}/protected_media:/protected_media
       - ${data}/logs:/logs
       - ${data}/cache:/root/.cache
+    networks:
+      - proxy
 
     environment:
       - SECRET_KEY=${shhhhKey}
@@ -87,3 +108,9 @@ services:
     image: redis:6
     container_name: redis
     restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
