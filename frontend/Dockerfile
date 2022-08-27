@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y git
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 ENV CLI_WIDTH 80
-RUN git clone https://github.com/LibrePhotos/librephotos-frontend /usr/src/app
+RUN git clone https://github.com/hallowelt-deco/librephotos-frontend /usr/src/app
 RUN npm install --legacy-peer-deps
 RUN npm run postinstall
 RUN npm run build
